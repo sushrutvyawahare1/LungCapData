@@ -1,0 +1,81 @@
+---
+title: "LungCapData"
+author: "SV"
+date: "December 4, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+# 1 . Print the first 6 rows of Lung Capacity Data.
+```{r}
+lung <- read.csv("LungCapData.csv")
+head(lung)
+```
+
+# 2. Using ggplot, create a histogram for LungCap variable.
+```{r}
+library(ggplot2)
+ggplot(lung, aes(x = LungCap)) + geom_histogram(color = 'blue')
+```
+
+# 3. Create a boxplot for LungCap & Age
+```{r}
+ggplot(lung, aes(x = LungCap, y = Age)) + geom_boxplot()
+```
+
+# 4. Create a barplot for gender variable & print a proportion table as well.
+```{r}
+ggplot(lung, aes(x = Gender)) + geom_bar()
+prop.table(table(lung$Gender))
+```
+
+# 5. Create a side by side boxplot for gender & compare the lung capacity of male & female.
+```{r}
+ggplot(lung, aes(x = Gender, y = LungCap)) + geom_boxplot()
+```
+
+# 6. Compare & Contrast the gender variable against Smoke variable using a bar plot.
+```{r}
+ggplot(lung, aes(x = Gender, fill = factor(Smoke))) + geom_bar(position = position_dodge(1))
+```
+
+# 7. Generate a full linear model with all variable, print r squared, RMES and residual plot.
+```{r}
+linearmodel <- lm(data = lung)
+summary(linearmodel)
+par(mfrow = c(2,2))
+plot(linearmodel)
+```
+
+# 8. Generate a reduced linear model with only significant variables, print the same values as above.
+```{r}
+library(caret)
+library(lattice)
+reducedlinearmodel <- lm(LungCap ~ Age + Height + Smoke + Gender, data = lung)
+predictions <- predict(reducedlinearmodel, lung[-1])
+RMSE(predictions, lung$LungCap)
+s <- summary(reducedlinearmodel)
+s
+```
+
+# 9. For F-test(ANOVA) write your null & alternate hypothesis.
+```{r}
+#Null <- There is no relationship between two phenomena.
+#alternative <- The Difference beween the two models is significant.
+```
+
+#10. Print F-statistic write your observations regarding the same.
+```{r}
+ano <- anova(linearmodel,reducedlinearmodel, test = "F")
+summary(ano)
+ano
+```
